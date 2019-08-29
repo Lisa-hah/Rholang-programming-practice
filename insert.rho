@@ -1,0 +1,38 @@
+new split, rankAndMerge, stdout(`rho:io:stdout`) in {
+    
+    split!([1,9,3,7,5,2,15], *stdout)|
+
+    contract split (@list,ret)={
+        match list {
+            [h, ...t] => {
+                new ack in{
+                    split!(t, *ack)|
+                    for(@tail<-ack){
+                        rankAndMerge!(h,tail,*ret)
+                    }
+                }
+                
+            }
+            [] => {ret!(list)}
+        }        
+    }|
+
+    contract rankAndMerge (@h, @t, ret)={
+        new position, list in{
+            position!(0)|list!([])|
+            for (@tailPosition<=position; @l<=list){
+                match t {
+                    [] => ret!([h])
+                    _ =>{   if (h<t.nth(tailPosition)){
+                                ret!(l++[h]++t.slice(tailPosition,t.length()))
+                            }
+                            else {
+                                list!(l++t.slice(tailPosition,tailPosition+1))|
+                                position!(tailPosition+1)
+                            }
+                        }
+                }                
+            }
+        }
+    }
+}
